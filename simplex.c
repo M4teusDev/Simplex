@@ -11,25 +11,34 @@ void monta_matriz(int lin, int col, float m[lin][col], int variaveis, int *p);
 void adiciona_folgas(int lin,int col,float m[lin][col]);
 void exibe_matriz(int lin,int col,float m[lin][col]);
 void adiciona_linha_z(int lin, int col, float m[lin][col], int *p, int var);
+int  valor_mais_negativo(int lin, int col, float m[lin][col]);
+int  busca_linha_pivo(int lin, int col, int coluna_pivo, float m[lin][col]);
 
 int main ( void )
 {
   char file[100] = "exemplo.txt";
   int *m = NULL, i = 0, tam_aloc, variaveis = 0, colunas = 0, linhas = 0, j = 0, restricoes = 0;
-  tam_aloc  = readMatrix(file, &m);
-  variaveis = qtdVariaveis(file);
+  tam_aloc   = readMatrix(file, &m);
+  variaveis  = qtdVariaveis(file);
   restricoes = variaveis + 1;
-  colunas = variaveis * 2 + 2;
-  linhas    = variaveis + 1;
+  colunas    = variaveis * 2 + 2;
+  linhas     = variaveis + 1;
 
   float matriz[linhas + 1][colunas];
 
+//Inicializa e modela matriz
    inicializa_matriz(linhas + 1, colunas, matriz);
    monta_matriz(linhas + 1, colunas, matriz, variaveis, m);
-
    adiciona_folgas(linhas + 1, colunas, matriz);
    adiciona_linha_z(linhas + 1, colunas, matriz, m, variaveis);
    exibe_matriz(linhas + 1, colunas, matriz);
+
+//Passo 1 - retorna índice do valor mais negativo da coluna z
+   int coluna_pivo = -1;
+   coluna_pivo = valor_mais_negativo(linhas + 1, colunas, matriz);
+//Passo 2 - Encontra o pivo
+    int linha_pivo = -1;
+    linha_pivo = busca_linha_pivo(linhas, colunas, coluna_pivo, matriz);
 
 }
 
@@ -151,4 +160,37 @@ void adiciona_linha_z(int lin, int col, float m[lin][col], int *p, int var)
     }
 }
 
+int  valor_mais_negativo(int lin, int col, float m[lin][col]) 
+{
+    float aux = m[lin - 1][0];
+    int indice = -1;
+
+    for( int i = 0; i < col; i++)
+    {
+        if(aux >= m[lin - 1][i] )
+            indice = i;
+    }
+
+    return indice;
+}
+
+int  busca_linha_pivo(int lin, int col, int coluna_pivo, float m[lin][col])
+{
+    float aux, flag = 0;
+
+    for(int i = 0; i < lin; i++)
+    {
+        if(m[i][coluna_pivo] > 0 && flag == 0){
+            aux = i;
+            flag++;
+        }
+        if(m[i][coluna_pivo] > 0 && flag > 1){
+            if(aux > m[i][col]/m[i][coluna_pivo]) {
+                aux = i;
+            }
+        }
+    }
+
+    return aux;
+}
 
