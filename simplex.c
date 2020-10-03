@@ -10,6 +10,7 @@ void inicializa_matriz(int lin, int col, float m[lin][col]);
 void monta_matriz(int lin, int col, float m[lin][col], int variaveis, int *p);
 void adiciona_folgas(int lin,int col,float m[lin][col]);
 void exibe_matriz(int lin,int col,float m[lin][col]);
+void adiciona_linha_z(int lin, int col, float m[lin][col], int *p, int var);
 
 int main ( void )
 {
@@ -27,7 +28,9 @@ int main ( void )
    monta_matriz(linhas + 1, colunas, matriz, variaveis, m);
 
    adiciona_folgas(linhas + 1, colunas, matriz);
+   adiciona_linha_z(linhas + 1, colunas, matriz, m, variaveis);
    exibe_matriz(linhas + 1, colunas, matriz);
+
 }
 
 int readMatrix(char *path, int **data)
@@ -133,3 +136,19 @@ void exibe_matriz(int lin,int col,float m[lin][col])
     }
         
 }
+
+void adiciona_linha_z(int lin, int col, float m[lin][col], int *p, int var)
+{
+    int k = 0, j = 0;
+    
+    while(j < var) 
+    {
+        if(*(p + k) > 0)
+            m[lin - 1][j++] = *(p + k) * -1;
+        else
+            m[lin - 1][j++] = *(p + k);
+        k++;
+    }
+}
+
+
