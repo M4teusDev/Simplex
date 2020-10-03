@@ -2,17 +2,20 @@
 #include <stdlib.h>
 #include <string.h>
 
-int  readMatrix(char *path, int **data);
-void aloca(int **p, int tam);
-int  qtdVariaveis(char *path);
-int  qtdLinhas(char *path);
-void inicializa_matriz(int lin, int col, float m[lin][col]);
-void monta_matriz(int lin, int col, float m[lin][col], int variaveis, int *p);
-void adiciona_folgas(int lin,int col,float m[lin][col]);
-void exibe_matriz(int lin,int col,float m[lin][col]);
-void adiciona_linha_z(int lin, int col, float m[lin][col], int *p, int var);
-int  valor_mais_negativo(int lin, int col, float m[lin][col]);
-int  busca_linha_pivo(int lin, int col, int coluna_pivo, float m[lin][col]);
+int   readMatrix(char *path, int **data);
+void  aloca(int **p, int tam);
+int   qtdVariaveis(char *path);
+int   qtdLinhas(char *path);
+void  inicializa_matriz(int lin, int col, float m[lin][col]);
+void  monta_matriz(int lin, int col, float m[lin][col], int variaveis, int *p);
+void  adiciona_folgas(int lin,int col,float m[lin][col]);
+void  exibe_matriz(int lin,int col,float m[lin][col]);
+void  adiciona_linha_z(int lin, int col, float m[lin][col], int *p, int var);
+int   valor_mais_negativo(int lin, int col, float m[lin][col]);
+int   busca_linha_pivo(int lin, int col, int coluna_pivo, float m[lin][col]);
+void  escalona_coluna(int lin, int col, int linha_pivo, int coluna_pivo, float m[lin][col]);
+float valor_multiplicacao(float dividendo, float divisor);
+
 
 int main ( void )
 {
@@ -39,6 +42,9 @@ int main ( void )
 //Passo 2 - Encontra o pivo
     int linha_pivo = -1;
     linha_pivo = busca_linha_pivo(linhas, colunas, coluna_pivo, matriz);
+//Escalonar coluna do pivo 
+    escalona_coluna(linhas, colunas, linha_pivo, coluna_pivo, matriz);
+
 
 }
 
@@ -194,3 +200,24 @@ int  busca_linha_pivo(int lin, int col, int coluna_pivo, float m[lin][col])
     return aux;
 }
 
+void escalona_coluna(int lin, int col, int linha_pivo, int coluna_pivo, float m[lin][col])
+{
+
+    float x = 0, pivo = m[linha_pivo][coluna_pivo], flag = 0;
+
+    for(int i = 0; i < lin; i++)
+    {
+        for(int j = 0; j < col; j++)
+        {
+            if(j == coluna_pivo && m[i][j] > 0 && i != linha_pivo)
+            {
+                if(flag == 0)
+                    x = valor_multiplicacao(m[i][j], pivo);
+            }
+        }
+    }
+}
+float valor_multiplicacao(float dividendo, float divisor)
+{
+    return dividendo/divisor;
+}
