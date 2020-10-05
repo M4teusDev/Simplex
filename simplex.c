@@ -1,21 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 int   readMatrix(char *path, int **data);
 void  aloca(int **p, int tam);
 int   qtdVariaveis(char *path);
 int   qtdLinhas(char *path);
+
 void  inicializa_matriz(int lin, int col, float m[lin][col]);
 void  monta_matriz(int lin, int col, float m[lin][col], int variaveis, int *p);
 void  adiciona_folgas(int lin,int col,float m[lin][col]);
 void  exibe_matriz(int lin,int col,float m[lin][col]);
 void  adiciona_linha_z(int lin, int col, float m[lin][col], int *p, int var);
+
+bool  valores_negativos(int lin, int col, float m[lin][col]);
 int   valor_mais_negativo(int lin, int col, float m[lin][col]);
 int   busca_linha_pivo(int lin, int col, int coluna_pivo, float m[lin][col]);
 void  escalona_coluna(int lin, int col, int linha_pivo, int coluna_pivo, float m[lin][col]);
 float valor_multiplicacao(float dividendo, float divisor);
-
 
 int main ( void )
 {
@@ -34,18 +37,26 @@ int main ( void )
    monta_matriz(linhas + 1, colunas, matriz, variaveis, m);
    adiciona_folgas(linhas + 1, colunas, matriz);
    adiciona_linha_z(linhas + 1, colunas, matriz, m, variaveis);
-   exibe_matriz(linhas + 1, colunas, matriz);
 
-//Passo 1 - retorna índice do valor mais negativo da coluna z
-   int coluna_pivo = -1;
-   coluna_pivo = valor_mais_negativo(linhas + 1, colunas, matriz);
-//Passo 2 - Encontra o pivo
-    int linha_pivo = -1;
-    linha_pivo = busca_linha_pivo(linhas, colunas, coluna_pivo, matriz);
-//Escalonar coluna do pivo 
-    escalona_coluna(linhas, colunas, linha_pivo, coluna_pivo, matriz);
+   bool x = false;
 
+int coluna_pivo = -1, linha_pivo = -1;
+    
+    while(i < 2)
+    {
 
+    //Passo 1 - retorna índice do valor mais negativo da coluna z
+        coluna_pivo = valor_mais_negativo(linhas, colunas, matriz);
+        
+    //Passo 2 - Encontra o pivo
+        linha_pivo = busca_linha_pivo(linhas, colunas, coluna_pivo, matriz);
+    //Passo 3 - Escalonar coluna do pivo 
+        escalona_coluna(linhas, colunas, linha_pivo, coluna_pivo, matriz);
+     i++;
+        
+    }       
+
+    exibe_matriz(linhas + 1, colunas, matriz);
 }
 
 int readMatrix(char *path, int **data)
@@ -123,7 +134,6 @@ void monta_matriz(int lin, int col, float m[lin][col], int variaveis, int *p)
                 k++;
             }
         }
-        printf("\n");   
     }
 }
 
@@ -145,7 +155,7 @@ void exibe_matriz(int lin,int col,float m[lin][col])
     {
         for( j = 0; j < col; j++) 
         {
-            printf("%.0f\t", m[i][j]);
+            printf("%.2f\t", m[i][j]);
         }
         printf("\n");        
     }
@@ -166,32 +176,47 @@ void adiciona_linha_z(int lin, int col, float m[lin][col], int *p, int var)
     }
 }
 
+bool  valores_negativos(int lin, int col, float m[lin][col])
+{
+    for(int j = 0; j < col ; j++) 
+        if(m[lin][j] < 0) return true;
+    return false;
+}
+
 int  valor_mais_negativo(int lin, int col, float m[lin][col]) 
 {
-    float aux = m[lin - 1][0];
+    float aux = m[lin][0];
     int indice = -1;
 
     for( int i = 0; i < col; i++)
     {
-        if(aux >= m[lin - 1][i] )
+        if(aux >= m[lin][i] )
+        {   
             indice = i;
+            aux = m[lin][i];
+        }
     }
-
     return indice;
 }
 
 int  busca_linha_pivo(int lin, int col, int coluna_pivo, float m[lin][col])
 {
-    float aux, flag = 0;
+    int i = 0, aux = 0, flag = 0;
+    float menor_resultado = 0.0;
 
     for(int i = 0; i < lin; i++)
     {
-        if(m[i][coluna_pivo] > 0 && flag == 0){
+        if(m[i][coluna_pivo] > 0 && flag == 0)  //Primeira interação maior que zero 
+        {
             aux = i;
             flag++;
+            menor_resultado = m[i][col - 1] / m[i][coluna_pivo];
         }
-        if(m[i][coluna_pivo] > 0 && flag > 1){
-            if(aux > m[i][col]/m[i][coluna_pivo]) {
+        else if(m[i][coluna_pivo] > 0 )
+        {
+            if(menor_resultado > (m[i][col - 1] / m[i][coluna_pivo]))
+            {
+                menor_resultado = m[i][col - 1] / m[i][coluna_pivo];
                 aux = i;
             }
         }
@@ -202,21 +227,34 @@ int  busca_linha_pivo(int lin, int col, int coluna_pivo, float m[lin][col])
 
 void escalona_coluna(int lin, int col, int linha_pivo, int coluna_pivo, float m[lin][col])
 {
+    
+    float x = 0, pivo = m[linha_pivo][coluna_pivo];
+    int k = 0, flag = 0, j = 0;
 
-    float x = 0, pivo = m[linha_pivo][coluna_pivo], flag = 0;
-
-    for(int i = 0; i < lin; i++)
-    {
-        for(int j = 0; j < col; j++)
-        {
-            if(j == coluna_pivo && m[i][j] > 0 && i != linha_pivo)
-            {
-                if(flag == 0)
-                    x = valor_multiplicacao(m[i][j], pivo);
+    x = valor_multiplicacao(1,pivo);
+    for(j = 0; j < col; j++)
+        m[linha_pivo][j] = m[linha_pivo][j] * x;
+    
+    for(int i = 0; i < lin + 1; i++) {
+        for(j = 0; j < col; j++){
+            if(j == coluna_pivo && m[i][j] != 0 && i != linha_pivo) {
+                if(flag == 0) {
+                    x = m[i][j]  *  (-1);
+                    flag++;
+                }
+                     
+                for(int k = 0; k < col; k++)
+                {
+                    //printf("%f + %f * %f  = %f\n",m[i][k] , x , m[linha_pivo][k], (m[i][k] + x * m[linha_pivo][k]));
+                    m[i][k] = m[i][k] + x * m[linha_pivo][k];                    
+                }   
             }
         }
+        
+        flag = 0;
     }
 }
+
 float valor_multiplicacao(float dividendo, float divisor)
 {
     return dividendo/divisor;
