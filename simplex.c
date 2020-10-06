@@ -14,7 +14,7 @@ void  adiciona_folgas(int lin,int col,float m[lin][col]);
 void  exibe_matriz(int lin,int col,float m[lin][col]);
 void  adiciona_linha_z(int lin, int col, float m[lin][col], int *p, int var);
 
-bool  valores_negativos(int lin, int col, float m[lin][col]);
+int   valores_negativos(int lin, int col, float m[lin][col]);
 int   valor_mais_negativo(int lin, int col, float m[lin][col]);
 int   busca_linha_pivo(int lin, int col, int coluna_pivo, float m[lin][col]);
 void  escalona_coluna(int lin, int col, int linha_pivo, int coluna_pivo, float m[lin][col]);
@@ -38,22 +38,16 @@ int main ( void )
    adiciona_folgas(linhas + 1, colunas, matriz);
    adiciona_linha_z(linhas + 1, colunas, matriz, m, variaveis);
 
-   bool x = false;
-
-int coluna_pivo = -1, linha_pivo = -1;
+    int coluna_pivo = -1, linha_pivo = -1;
     
-    while(i < 2)
+    while(( i = valores_negativos(linhas,colunas,matriz)))
     {
-
     //Passo 1 - retorna índice do valor mais negativo da coluna z
         coluna_pivo = valor_mais_negativo(linhas, colunas, matriz);
-        
     //Passo 2 - Encontra o pivo
         linha_pivo = busca_linha_pivo(linhas, colunas, coluna_pivo, matriz);
     //Passo 3 - Escalonar coluna do pivo 
-        escalona_coluna(linhas, colunas, linha_pivo, coluna_pivo, matriz);
-     i++;
-        
+        escalona_coluna(linhas, colunas, linha_pivo, coluna_pivo, matriz);      
     }       
 
     exibe_matriz(linhas + 1, colunas, matriz);
@@ -176,19 +170,20 @@ void adiciona_linha_z(int lin, int col, float m[lin][col], int *p, int var)
     }
 }
 
-bool  valores_negativos(int lin, int col, float m[lin][col])
+int  valores_negativos(int lin, int col, float m[lin][col])
 {
-    for(int j = 0; j < col ; j++) 
-        if(m[lin][j] < 0) return true;
+    int j = 0;
+    for(j = 0; j < col ; j++)
+        if(m[lin][j] < 0) return true;        
     return false;
 }
 
 int  valor_mais_negativo(int lin, int col, float m[lin][col]) 
 {
     float aux = m[lin][0];
-    int indice = -1;
+    int indice = -1, i = 0;
 
-    for( int i = 0; i < col; i++)
+    for(i = 0; i < col; i++)
     {
         if(aux >= m[lin][i] )
         {   
@@ -204,7 +199,7 @@ int  busca_linha_pivo(int lin, int col, int coluna_pivo, float m[lin][col])
     int i = 0, aux = 0, flag = 0;
     float menor_resultado = 0.0;
 
-    for(int i = 0; i < lin; i++)
+    for(i = 0; i < lin; i++)
     {
         if(m[i][coluna_pivo] > 0 && flag == 0)  //Primeira interação maior que zero 
         {
@@ -226,16 +221,15 @@ int  busca_linha_pivo(int lin, int col, int coluna_pivo, float m[lin][col])
 }
 
 void escalona_coluna(int lin, int col, int linha_pivo, int coluna_pivo, float m[lin][col])
-{
-    
+{ 
     float x = 0, pivo = m[linha_pivo][coluna_pivo];
-    int k = 0, flag = 0, j = 0;
+    int k = 0, flag = 0, j = 0, i =0;
 
     x = valor_multiplicacao(1,pivo);
     for(j = 0; j < col; j++)
         m[linha_pivo][j] = m[linha_pivo][j] * x;
     
-    for(int i = 0; i < lin + 1; i++) {
+    for(i = 0; i < lin + 1; i++) {
         for(j = 0; j < col; j++){
             if(j == coluna_pivo && m[i][j] != 0 && i != linha_pivo) {
                 if(flag == 0) {
@@ -244,13 +238,9 @@ void escalona_coluna(int lin, int col, int linha_pivo, int coluna_pivo, float m[
                 }
                      
                 for(int k = 0; k < col; k++)
-                {
-                    //printf("%f + %f * %f  = %f\n",m[i][k] , x , m[linha_pivo][k], (m[i][k] + x * m[linha_pivo][k]));
                     m[i][k] = m[i][k] + x * m[linha_pivo][k];                    
-                }   
             }
-        }
-        
+        }  
         flag = 0;
     }
 }
