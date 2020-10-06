@@ -9,14 +9,16 @@ int   qtdVariaveis(char *path);
 int   qtdLinhas(char *path);
 
 void  inicializa_matriz(int lin, int col, float m[lin][col]);
+void  inicializa_cabecalho_matriz(int lin, int col, int *l, int *c, int var);
 void  monta_matriz(int lin, int col, float m[lin][col], int variaveis, int *p);
 void  adiciona_folgas(int lin,int col,float m[lin][col]);
-void  exibe_matriz(int lin,int col,float m[lin][col]);
+void  exibe_matriz(int lin,int col,float m[lin][col], int *l, int *c);
 void  adiciona_linha_z(int lin, int col, float m[lin][col], int *p, int var);
 
 int   valores_negativos(int lin, int col, float m[lin][col]);
 int   valor_mais_negativo(int lin, int col, float m[lin][col]);
 int   busca_linha_pivo(int lin, int col, int coluna_pivo, float m[lin][col]);
+void  remove_base(int *l, int *c, int lp, int cp);
 void  escalona_coluna(int lin, int col, int linha_pivo, int coluna_pivo, float m[lin][col]);
 float valor_multiplicacao(float dividendo, float divisor);
 
@@ -31,9 +33,14 @@ int main ( void )
   linhas     = variaveis + 1;
 
   float matriz[linhas + 1][colunas];
+  int nome_linha[linhas + 1], nome_coluna[colunas];
+
+
+
 
 //Inicializa e modela matriz
    inicializa_matriz(linhas + 1, colunas, matriz);
+   inicializa_cabecalho_matriz(linhas + 1, colunas, nome_linha, nome_coluna, variaveis);
    monta_matriz(linhas + 1, colunas, matriz, variaveis, m);
    adiciona_folgas(linhas + 1, colunas, matriz);
    adiciona_linha_z(linhas + 1, colunas, matriz, m, variaveis);
@@ -46,11 +53,13 @@ int main ( void )
         coluna_pivo = valor_mais_negativo(linhas, colunas, matriz);
     //Passo 2 - Encontra o pivo
         linha_pivo = busca_linha_pivo(linhas, colunas, coluna_pivo, matriz);
-    //Passo 3 - Escalonar coluna do pivo 
+    //Passo 3 - Substitui x
+        remove_base(nome_linha, nome_coluna, linha_pivo, coluna_pivo);
+    //Passo 4 - Escalonar coluna do pivo 
         escalona_coluna(linhas, colunas, linha_pivo, coluna_pivo, matriz);      
     }       
 
-    exibe_matriz(linhas + 1, colunas, matriz);
+    exibe_matriz(linhas + 1, colunas, matriz, nome_linha, nome_coluna);
 }
 
 int readMatrix(char *path, int **data)
@@ -109,6 +118,17 @@ void inicializa_matriz(int lin, int col, float m[lin][col])
       m[i][j] = 0.0;
 }
 
+void  inicializa_cabecalho_matriz(int lin, int col, int *l, int *c, int var)
+{
+    int i = 0;
+
+    for(i = 0; i <= col + 1; i++)
+        *(c + i) = i + 1;
+
+    for(i = 0; i < lin; i++)
+        *(l + i) = *(c + i + var);
+}
+
 void monta_matriz(int lin, int col, float m[lin][col], int variaveis, int *p)
 {
     int  i = 0, j = 0, k = 0;
@@ -141,12 +161,26 @@ void adiciona_folgas(int lin,int col,float m[lin][col])
                 m[i][j] = 1.0;
 }
 
-void exibe_matriz(int lin,int col,float m[lin][col])
+void exibe_matriz(int lin,int col,float m[lin][col], int *l, int *c)
 {
     int  i = 0, j = 0;
 
+    printf("\t");
+    for(i = 0; i < col; i++)
+    {
+         if(i != col - 1) 
+             printf("X%i\t", *(c + i));
+        else 
+             printf("B\t");
+    }
+
+    printf("\n");
     for( i = 0; i < lin; i++)
     {
+        if(i != lin - 1) 
+            printf("X%i\t", *(l + i));
+        else 
+             printf("Z\t");
         for( j = 0; j < col; j++) 
         {
             printf("%.2f\t", m[i][j]);
@@ -218,6 +252,11 @@ int  busca_linha_pivo(int lin, int col, int coluna_pivo, float m[lin][col])
     }
 
     return aux;
+}
+
+void  remove_base(int *l, int *c, int lp, int cp)
+{
+    *(l + lp) = *(c + cp);
 }
 
 void escalona_coluna(int lin, int col, int linha_pivo, int coluna_pivo, float m[lin][col])
