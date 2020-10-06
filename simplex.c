@@ -3,17 +3,17 @@
 #include <string.h>
 #include <stdbool.h>
 
-int   readMatrix(char *path, int **data);
-void  aloca(int **p, int tam);
+int   readMatrix(char *path, float **data);
+void  aloca(float **p, int tam);
 int   qtdVariaveis(char *path);
 int   qtdLinhas(char *path);
 
 void  inicializa_matriz(int lin, int col, float m[lin][col]);
 void  inicializa_cabecalho_matriz(int lin, int col, int *l, int *c, int var);
-void  monta_matriz(int lin, int col, float m[lin][col], int variaveis, int *p);
+void  monta_matriz(int lin, int col, float m[lin][col], int variaveis, float *p);
 void  adiciona_folgas(int lin,int col,float m[lin][col]);
 void  exibe_matriz(int lin,int col,float m[lin][col], int *l, int *c);
-void  adiciona_linha_z(int lin, int col, float m[lin][col], int *p, int var);
+void  adiciona_linha_z(int lin, int col, float m[lin][col], float *p, int var);
 
 int   valores_negativos(int lin, int col, float m[lin][col]);
 int   valor_mais_negativo(int lin, int col, float m[lin][col]);
@@ -25,7 +25,9 @@ float valor_multiplicacao(float dividendo, float divisor);
 int main ( void )
 {
   char file[100] = "exemplo.txt";
-  int *m = NULL, i = 0, tam_aloc, variaveis = 0, colunas = 0, linhas = 0, j = 0, restricoes = 0;
+  int i = 0, tam_aloc, variaveis = 0, colunas = 0, linhas = 0, j = 0, restricoes = 0;
+  float *m = NULL;
+
   tam_aloc   = readMatrix(file, &m);
   variaveis  = qtdVariaveis(file);
   restricoes = variaveis + 1;
@@ -34,9 +36,6 @@ int main ( void )
 
   float matriz[linhas + 1][colunas];
   int nome_linha[linhas + 1], nome_coluna[colunas];
-
-
-
 
 //Inicializa e modela matriz
    inicializa_matriz(linhas + 1, colunas, matriz);
@@ -56,24 +55,25 @@ int main ( void )
     //Passo 3 - Substitui x
         remove_base(nome_linha, nome_coluna, linha_pivo, coluna_pivo);
     //Passo 4 - Escalonar coluna do pivo 
-        escalona_coluna(linhas, colunas, linha_pivo, coluna_pivo, matriz);      
+        escalona_coluna(linhas, colunas, linha_pivo, coluna_pivo, matriz);  
     }       
 
     exibe_matriz(linhas + 1, colunas, matriz, nome_linha, nome_coluna);
 }
 
-int readMatrix(char *path, int **data)
+int readMatrix(char *path, float **data)
 {
     FILE *file;
     file = fopen(path, "r");
-    int aux = 0, tam_aloc = 0;
+    int tam_aloc = 0;
+    float aux;
 
     if (file == NULL) {
         fprintf(stderr, "error: while trying to open `%s' for reading\n", path);
         return 0; //
     }
     
-    while (fscanf(file, "%d ", &aux) == 1) {
+    while (fscanf(file, "%f", &aux) == 1) {
       aloca(data, ++tam_aloc);
       *(*data + tam_aloc - 1) = aux;
     }
@@ -82,9 +82,9 @@ int readMatrix(char *path, int **data)
     return tam_aloc;
 }
 
-void aloca(int **p, int tam){
+void aloca(float **p, int tam){
 
-  if( (*p = (int *)realloc( *p ,tam * sizeof(int))) == NULL) {
+  if( (*p = (float *)realloc( *p ,tam * sizeof(float))) == NULL) {
         printf("Estamos sem memoria...");
         exit(1);
     }
@@ -129,7 +129,7 @@ void  inicializa_cabecalho_matriz(int lin, int col, int *l, int *c, int var)
         *(l + i) = *(c + i + var);
 }
 
-void monta_matriz(int lin, int col, float m[lin][col], int variaveis, int *p)
+void monta_matriz(int lin, int col, float m[lin][col], int variaveis, float *p)
 {
     int  i = 0, j = 0, k = 0;
 
@@ -190,7 +190,7 @@ void exibe_matriz(int lin,int col,float m[lin][col], int *l, int *c)
         
 }
 
-void adiciona_linha_z(int lin, int col, float m[lin][col], int *p, int var)
+void adiciona_linha_z(int lin, int col, float m[lin][col], float *p, int var)
 {
     int k = 0, j = 0;
     
@@ -276,7 +276,7 @@ void escalona_coluna(int lin, int col, int linha_pivo, int coluna_pivo, float m[
                     flag++;
                 }
                      
-                for(int k = 0; k < col; k++)
+                for(k = 0; k < col; k++)
                     m[i][k] = m[i][k] + x * m[linha_pivo][k];                    
             }
         }  
