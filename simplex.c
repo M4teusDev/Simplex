@@ -6,7 +6,7 @@
 int   readMatrix(char *path, float **data);
 void  aloca(float **p, int tam);
 int   qtdVariaveis(char *path);
-int   qtdLinhas(char *path);
+int   qtd_linhas(char *path);
 
 void  inicializa_matriz(int lin, int col, float m[lin][col]);
 void  inicializa_cabecalho_matriz(int lin, int col, int *l, int *c, int var);
@@ -24,7 +24,7 @@ float valor_multiplicacao(float dividendo, float divisor);
 
 int main ( void )
 {
-  char file[100] = "exemplo.txt";
+  char file[100] = "exemplo 01.txt";
   int i = 0, tam_aloc, variaveis = 0, colunas = 0, linhas = 0, j = 0, restricoes = 0;
   float *m = NULL;
 
@@ -32,7 +32,7 @@ int main ( void )
   variaveis  = qtdVariaveis(file);
   restricoes = variaveis + 1;
   colunas    = variaveis * 2 + 2;
-  linhas     = variaveis + 1;
+  linhas     = qtd_linhas(file);
 
   float matriz[linhas + 1][colunas];
   int nome_linha[linhas + 1], nome_coluna[colunas];
@@ -108,6 +108,32 @@ int qtdVariaveis(char *path)
     
   fclose(file);
   return cont + 1;
+}
+
+int   qtd_linhas(char *path)
+{
+    FILE *file;
+    char c = '\n', linha[100];
+    int cont = 0;
+
+    if ((file = fopen(path, "r")) == NULL)
+      exit(1);
+    
+    fread(&linha, sizeof(char), 100, file);
+
+    for (int i = 0; i < strlen(linha); i++){
+        if(linha[i] == c)
+            cont++;
+    }
+
+    fclose(file);
+
+    return cont;
+
+     
+
+
+
 }
 
 void inicializa_matriz(int lin, int col, float m[lin][col]) 
