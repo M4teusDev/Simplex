@@ -31,13 +31,13 @@ int main ( void )
   readMatrix(file, &m);
   variaveis  = qtdVariaveis(file);
   linhas     = qtd_linhas(file);
-  colunas    = variaveis * 2 + 2;
+  colunas    = variaveis + linhas + 1;
 
   float matriz[linhas + 1][colunas];
   int nome_linha[linhas + 1], nome_coluna[colunas];
 
 //Inicializa e modela matriz
-   inicializa_matriz(linhas + 1, colunas, matriz);
+   inicializa_matriz(linhas + 1, colunas, matriz); //Inicializa matriz como 0
    inicializa_cabecalho_matriz(linhas + 1, colunas, nome_linha, nome_coluna, variaveis);
    monta_matriz(linhas + 1, colunas, matriz, variaveis, m);
    adiciona_folgas(linhas + 1, colunas, matriz);
@@ -68,7 +68,7 @@ int readMatrix(char *path, float **data)
     float aux;
 
     if (file == NULL) {
-        fprintf(stderr, "error: while trying to open `%s' for reading\n", path);
+        fprintf(stderr, "Error: Ao abrir o arquivo `%s' para leitura\n", path);
         return 0; //
     }
     
@@ -187,12 +187,10 @@ void exibe_matriz(int lin,int col,float m[lin][col], int *l, int *c)
 
     printf("\t");
     for(i = 0; i < col; i++)
-    {
          if(i != col - 1) 
              printf("X%i\t", *(c + i));
         else 
              printf("B\t");
-    }
 
     printf("\n");
     for( i = 0; i < lin; i++)
@@ -202,12 +200,10 @@ void exibe_matriz(int lin,int col,float m[lin][col], int *l, int *c)
         else 
              printf("Z\t");
         for( j = 0; j < col; j++) 
-        {
             printf("%.2f\t", m[i][j]);
-        }
+            
         printf("\n");        
-    }
-        
+    }   
 }
 
 void adiciona_linha_z(int lin, int col, float m[lin][col], float *p, int var)
